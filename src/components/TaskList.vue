@@ -383,7 +383,7 @@
                         <v-divider vertical/>
                         <th class="text-center" style="font-size: 14px;">Задачи</th>
                     </tr>
-                    <tr v-for="(task, taskIndex, key) in tasklist" @click="readItem(taskIndex)" :key="key">
+                    <tr v-for="(task, taskIndex) in tasklist" @click="readItem(taskIndex)">
                         <td class="table-border main-table-taskname">
                             {{ task.taskName }}                               
                         </td>
@@ -394,10 +394,10 @@
                                 <template #activator="props"> 
                                     <div class="subtask-table-container">
                                         <div class="main-table-row" v-for="(subtask, subtaskIndex) in task.subtask.slice(0,5)" :props="props">
-                                            <h5 class="subtask-table-text" >
+                                            <h5 class="subtask-table-text my-1">
                                                 {{ subtask.subtaskName }}
                                             </h5>
-                                            <input class="ma-1" 
+                                            <input class="mx-2" 
                                             type="checkbox" 
                                             :checked="subtask.status"
                                             @input="changeStatus({
@@ -878,6 +878,7 @@
 
     .subtask-table-text {
         font-weight: normal;
+        font-size: 14px;
     }
 
     .subtask-table-container {
