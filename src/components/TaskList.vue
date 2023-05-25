@@ -29,7 +29,7 @@
                             color="white"
                             x-large
                             @click="listenDelete = true, listenEdit = false" 
-                            :disabled="isEmpty">
+                            :disabled="isTasklistEmpty">
                                 <v-icon>
                                     mdi-close-box-outline
                                 </v-icon>
@@ -42,7 +42,7 @@
                             color="white"
                             x-large
                             @click="listenEdit = true, listenDelete = false" 
-                            :disabled="isEmpty">
+                            :disabled="isTasklistEmpty">
                                 <v-icon>
                                     mdi-pencil-outline
                                 </v-icon>
@@ -50,11 +50,11 @@
                         </v-col>
                     </v-card-actions>
                 </v-row> 
-            </v-container>            
+            </v-container>
         </v-card>  
 
         <div class="mt-8">
-            <v-row justify="space-around" v-if="listenDelete&!listenEdit">
+            <v-row justify="space-around" v-if="listenDelete && !listenEdit">
                 <h3 class="white--text">
                     Выберите, какое задание удалить
                     <v-btn
@@ -63,7 +63,7 @@
                     x-large
                     v-if="listenDelete" 
                     @click="listenDelete = false" 
-                    :disabled="isEmpty">
+                    :disabled="isTasklistEmpty">
                         <v-icon>
                             mdi-close
                         </v-icon>
@@ -71,7 +71,7 @@
                 </h3>
             </v-row>
 
-            <v-row justify="space-around" v-if="listenEdit&&!listenDelete">
+            <v-row justify="space-around" v-if="listenEdit && !listenDelete">
                 <h3 class="white--text">
                     Выберите, какое задание отредактировать
                     <v-btn
@@ -80,7 +80,7 @@
                     x-large
                     v-if="listenEdit" 
                     @click="listenEdit = false" 
-                    :disabled="isEmpty">
+                    :disabled="isTasklistEmpty">
                         <v-icon>
                             mdi-close
                         </v-icon>
@@ -92,20 +92,19 @@
         <!--Модальное окно добавления задания-->
         <div class="add-modal">
             <modal :dialog="isAddModalVisible" @close="closeAddModal">
-                <template v-slot:title>
+                <template #title>
                     <h3 class="modal-title">Создать задание</h3>
                 </template>
-                <template v-slot:body>
+                <template #body>
                     <div>
                         <v-textarea  
                         label="Задание" 
                         placeholder="Введите текст задания"
-                        @input="saveAddDisabled = false" 
+                        @input="isSaveAddDisabled = false" 
                         v-model="taskInput"
                         color="teal"
                         rows="4"
-                        auto-grow>
-                        </v-textarea>
+                        auto-grow/>
                     </div>                            
                     <div>
                         <h4 class="subtask-modal-list">Список задач   
@@ -129,8 +128,7 @@
                                 outlined
                                 class="pt-4"
                                 rows="3"
-                                auto-grow>
-                                </v-textarea>
+                                auto-grow/>
                             
                                 <v-btn 
                                 @click="addSubtask({data: subtaskAddInput})" 
@@ -153,17 +151,16 @@
                                     {{ subtask.subtaskName }}
                                 </p>
                                 <v-divider 
-                                v-if="index < buffer.length - 1">
-                                </v-divider>
+                                v-if="index < buffer.length - 1"/>
                             </h5>
                         </v-card>                                                           
                     </div>                
                 </template>
-                <template v-slot:footer>
+                <template #footer>
                     <v-row justify="end">
                         <v-btn 
                         @click="addTask({data: taskInput})" 
-                        :disabled="saveAddDisabled"
+                        :disabled="isSaveAddDisabled"
                         color="green"
                         small
                         class="ma-1 white--text">
@@ -186,23 +183,22 @@
             <modal :dialog="isEditModalVisible" 
             @close="showRejectEditModal"
             v-if="isEditModalVisible">
-                <template v-slot:title>
-                    <h4 class="modal-title">Изменить задание</h4>
+                <template #title>
+                    <h3 class="modal-title">Изменить задание</h3>
                 </template>
-                <template v-slot:body>
+                <template #body>
                     <div>
                         <v-textarea  
                         label="Задание" 
                         placeholder="Введите текст задания"
-                        @input="saveEditDisabled = false" 
+                        @input="isSaveEditDisabled = false" 
                         @focus="taskFocus($event)"
                         @blur="taskBlur($event)"
                         v-model="editBuffer.taskName"
                         color="teal"
                         rows="4"
                         auto-grow
-                        >
-                        </v-textarea>
+                        />
                     </div>
 
                     <h4 class="subtask-modal-list">Список задач
@@ -236,8 +232,7 @@
                             outlined
                             class="pt-4"
                             rows="3"
-                            auto-grow>
-                            </v-textarea>
+                            auto-grow/>
                             <v-btn 
                             @click="addEditSubtask()" 
                             :disabled="addSubtaskDisabled"
@@ -267,17 +262,17 @@
                                 <th class="text-center">Статус</th>
                                 <th class="text-center">Название</th>
                             </tr>
-                            <tr v-for="(subtask, subtaskIndex, key) in editBuffer.subtask" :key="key">
+                            <tr v-for="(subtask, subtaskIndex) in editBuffer.subtask">
                                 <td>
                                     <input class="mt-4 mx-auto" 
                                     type="checkbox"  
-                                    @input="saveEditDisabled = false"
+                                    @input="isSaveEditDisabled = false"
                                     v-model="subtask.status">                                               
                                 </td>                            
                                 <td @click="readItem(subtaskIndex)">                                           
                                     <div>
                                         <v-textarea
-                                        @input="saveEditDisabled = false" 
+                                        @input="isSaveEditDisabled = false" 
                                         @focus="subtaskFocus($event)"
                                         @blur="subtaskBlur(subtaskIndex, $event)"
                                         v-model="subtask.subtaskName"
@@ -286,15 +281,14 @@
                                         flat
                                         auto-grow
                                         rows="2"
-                                        >
-                                        </v-textarea>
+                                        />
                                     </div>
                                 </td>						
                             </tr>                                       
                         </tbody> 
                     </table>                                        
                 </template>
-                <template v-slot:footer>
+                <template #footer>
                     <div>
                         <v-btn
                         icon
@@ -320,7 +314,7 @@
                     small
                     class="ma-1 white--text"
                     @click="confirmEdit" 
-                    :disabled="saveEditDisabled">
+                    :disabled="isSaveEditDisabled">
                         Сохранить
                     </v-btn>
                     <v-btn
@@ -340,10 +334,10 @@
             @close="closeDeleteModal" 
             @reject="closeDeleteModal" 
             @confirm="confirmDelete">
-                <template v-slot:title>
+                <template #title>
                     <h4 class="modal-title">Удалить задание</h4>
                 </template>
-                <template v-slot:body>
+                <template #body>
                     <h5>Вы действительно хотите удалить это задание?</h5>
                 </template>
             </modal>
@@ -355,10 +349,10 @@
             @close="closeSubDeleteModal" 
             @reject="closeSubDeleteModal" 
             @confirm="confirmSubDelete">
-                <template v-slot:title>
+                <template #title>
                     <h4 class="modal-title">Удалить задачу</h4>
                 </template>
-                <template v-slot:body>
+                <template #body>
                     <h5>Вы действительно хотите удалить эту задачу?</h5>
                 </template>
             </modal>
@@ -370,10 +364,10 @@
             @close="closeRejectEditModal" 
             @reject="closeRejectEditModal" 
             @confirm="rejectEdit">
-                <template v-slot:title>
+                <template #title>
                     <h4 class="modal-title">Отменить изменение</h4>
                 </template>
-                <template v-slot:body>
+                <template #body>
                     <h5>Вы действительно хотите отменить изменения?</h5>
                     <h5>Несохраненные изменения будут удалены.</h5>
                 </template>
@@ -382,22 +376,22 @@
 
         <!--Таблица заданий на главном экране-->
         <div>
-            <v-simple-table class="main-table elevation-3" v-if="!isEmpty">
+            <v-simple-table class="main-table elevation-3" v-if="!isTasklistEmpty">
                 <tbody>
                     <tr>
                         <th class="text-center table-border" style="font-size: 14px;">Задания</th>
-                        <v-divider vertical></v-divider>
+                        <v-divider vertical/>
                         <th class="text-center" style="font-size: 14px;">Задачи</th>
                     </tr>
                     <tr v-for="(task, taskIndex, key) in tasklist" @click="readItem(taskIndex)" :key="key">
                         <td class="table-border main-table-taskname">
                             {{ task.taskName }}                               
                         </td>
-                        <v-divider vertical></v-divider>                        
+                        <v-divider vertical/>                      
                         <td @mouseenter="showTip(taskIndex)" 
                         @mouseleave="hideTip(taskIndex)">                                           
                             <v-tooltip right v-model="tableMouse[taskIndex]" color="teal lighten-2" transition="scale-transition">
-                                <template v-slot:activator="props"> 
+                                <template #activator="props"> 
                                     <div class="subtask-table-container">
                                         <div class="main-table-row" v-for="(subtask, subtaskIndex) in task.subtask.slice(0,5)" :props="props">
                                             <h5 class="subtask-table-text" >
@@ -472,7 +466,7 @@
                 subtaskAddInput: '', //ввод названия задачи
                 showSubtaskInput: false, //показать/скрыть ввод названия задачи
                 addSubtaskDisabled: true, //нельзя добавить задачу с пустым названием
-                saveAddDisabled: true, //нельзя добавить задание с пустым названием или без задач
+                isSaveAddDisabled: true, //нельзя добавить задание с пустым названием или без задач
 
                 // DELETE
                 listenDelete: false, //слушатель выбора задания для удаления
@@ -489,7 +483,7 @@
                 subtaskEditInput: '', //ввод названия задачи
                 editIndex: null, //индекс редактируемого задания
                 editInput: '', //ввод названия задания
-                saveEditDisabled: true, //сохранение задания запрещено                 
+                isSaveEditDisabled: true, //сохранение задания запрещено                 
                 editBuffer: {}, //буфер редактирования задания  
                  
                 
@@ -510,7 +504,7 @@
                 'buffer',
                 'mockCopy'
             ]),
-            isEmpty() {
+            isTasklistEmpty() {
                 return this.tasklist.length === 0;
             },
             undoJournalActivated() {
@@ -567,7 +561,7 @@
             addSubtask(payload) {
                 this.$store.dispatch('tasklist/addSubtask', payload); 
                 //теперь можно сохранить задание, но опять нельзя добавить безымянную задачу
-                this.saveAddDisabled = false;
+                this.isSaveAddDisabled = false;
                 this.subtaskAddInput = '';
                 this.addSubtaskDisabled = true;
             },
@@ -578,7 +572,7 @@
                 //очистка буфера задач
                 this.clearBuffer();
                 //нельзя добавить пустое задание
-                this.saveAddDisabled = true;
+                this.isSaveAddDisabled = true;
                 //ввод задачи не показывается
                 this.showSubtaskInput = false;
                 //очищение инпутов
@@ -621,14 +615,14 @@
                     subtask: this.editBuffer.subtask[this.editBuffer.subtask.length - 1]
                 })
                 //теперь можно сохранить изменения, опять нельзя добавить безымянную задачу
-                this.saveEditDisabled = false;
+                this.isSaveEditDisabled = false;
                 this.subtaskEditInput = '';
                 this.addSubtaskDisabled = true;
             }, 
             changeBufferStatus(subtaskIndex) {
                 //смена состояния задачи в копии списка заданий
                 this.editBuffer.subtask[subtaskIndex].status = !this.editBuffer.subtask[subtaskIndex].status;
-                this.saveEditDisabled = false;
+                this.isSaveEditDisabled = false;
             },
             confirmEdit() {
                 this.$store.dispatch('tasklist/confirmEdit', {
@@ -648,7 +642,7 @@
                     this.editBuffer.subtask.splice(this.deleteSubtaskIndex, 1);
                 }
                 this.closeSubDeleteModal();
-                this.saveEditDisabled = false;
+                this.isSaveEditDisabled = false;
                 this.deleteSubtaskIndex = null;
             },
 
@@ -667,7 +661,7 @@
                 //ввод новой задачи не показывается             
                 this.showSubtaskInput = false;
                 //нельзя сохранить неизмененное задание
-                this.saveEditDisabled = true;
+                this.isSaveEditDisabled = true;
                 //зануление индекса под кликом
                 this.editIndex = null; 
                 //очищение журналов
@@ -694,7 +688,7 @@
             },
             //вывод окна отказа от изменений
             showRejectEditModal() {
-                if (this.saveEditDisabled) {
+                if (this.isSaveEditDisabled) {
                     this.closeEditModal();
                 }
                 else {
