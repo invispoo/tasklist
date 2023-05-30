@@ -1,20 +1,20 @@
 <template>
-    <div class="edit-modal">
+    <div>
         <modal :dialog="isModalVisible" 
         @close="close()"
         v-if="isModalVisible">
             <template #title>
-                <h3 class="modal-title">{ modalTitle }</h3>
+                <h3 class="modal-title">{{ modalTitle }}</h3>
             </template>
             <template #body>
                 <div>
                     <v-textarea  
                     label="Задание" 
                     placeholder="Введите текст задания"
-                    @input="isSaveDisabled = false" 
-                    @focus="taskFocus($event)"
-                    @blur="taskBlur($event)"
-                    v-model="inputModel"
+                    @input="taskIn" 
+                    @focus="focus"
+                    @blur="blur"
+                    :value="taskInput"
                     color="teal"
                     rows="4"
                     auto-grow
@@ -22,42 +22,32 @@
                 </div>
 
                 <div>
-                    <h4 class="subtask-modal-list">Список задач   
+                    <h4 class="subtask-modal-list">Список задач    
                         <v-btn
                         icon
                         color="teal"
                         small
-                        @click="showSubtaskInput = !showSubtaskInput">
+                        @click="showSubtaskInput = !showSubtaskInput"><!--менять-->
                             <v-icon>
                                 mdi-plus-box-outline
                             </v-icon>
                         </v-btn>  
-                        <v-btn
-                        icon
-                        color="teal"
-                        small
-                        @click="listenSubtask = !listenSubtask"
-                        v-if="editBuffer.subtask.length > 0">
-                            <v-icon>
-                                mdi-close-box-outline
-                            </v-icon>
-                        </v-btn>                         
+                        <slot name="delete-subtask"/>                     
                     </h4>  
                     <div v-if="showSubtaskInput">
                         <v-row class="d-flex justify-center align-center pl-3">
                             <v-textarea 
                             placeholder="Введите текст задачи"
-                            @input="addSubtaskDisabled = false" 
-                            v-model="subtaskAddInput"
+
+                            v-model="subtaskInput"
                             color="teal"
                             outlined
                             class="pt-4"
                             rows="3"
                             auto-grow/>
-                        
                             <v-btn 
-                            @click="addSubtask()" 
-                            :disabled="addSubtaskDisabled"
+                            @click="addSubtask" 
+                            :disabled="isSubtaskEmpty"
                             class="teal--text"
                             small
                             text
@@ -66,39 +56,21 @@
                             </v-btn>
                         </v-row>
                     </div>   
-                    <v-row justify="center" v-if="listenSubtask">
-                        <h4>Выберите, какую задачу удалить
-                            <v-btn
-                            icon
-                            color="teal lighten-3"
-                            @click="listenSubtask = false">
-                                <v-icon>
-                                    mdi-close
-                                </v-icon>
-                            </v-btn>
-                        </h4>
-                    </v-row>
-                    <slot name="taskview">
-                        Default content
-                    </slot>
+                    <slot name="taskview"/>
                 </div>
             </template>      
             <template #footer>
-                <slot name="journal-buttons">
-                    Default content
-                </slot>
-
-                <!--v-row justify="end"-->
+                <slot name="journal-buttons"/>
                 <v-btn 
-                @click="confirm()" 
-                :disabled="isSaveDisabled"
+                @click="confirm" 
+                :disabled="isSaveDisabled && isSaveEditDisabled"
                 color="green"
                 small
                 class="ma-1 white--text">
                     Сохранить
-                </v-btn>
+                </v-btn> <!--менять-->
                 <v-btn 
-                @click="close()"
+                @click="close"
                 color="red darken-1"
                 small
                 class="ma-1 white--text">
@@ -114,8 +86,57 @@
 <script>
     import Modal from './Modal';
     export default {
-        props: ['isModalVisible', 'closingFunction', 'modalTitle', 'isSaveDisabled', 'inputModel', 'showSubtaskInput',
-        'addSubtaskDisabled', 'subtaskInput'],
+        props: ['isModalVisible', 'modalTitle', 'taskInput', 'listenSubtask', 'isSaveEditDisabled'],
+        data () {
+            return {
+                showSubtaskInput: false,
+                isSaveDisabled: true,
+                subtaskInput: '',//
+                addSubtaskDisabled: true//
+            }
+        },
+        computed: {
+            isSubtaskEmpty () {
+                return this.subtaskInput === '';
+            },
+        },
+        methods: {
+            close () {
+                //ввод задачи не показывается
+                this.showSubtaskInput = false;
+                this.clearInputFlags();
+                this.$emit('close');
+            },
+            confirm () {
+                //ввод задачи не показывается
+                this.showSubtaskInput = false;
+                this.clearInputFlags();
+                this.$emit('confirm');
+            },
+            focus (e) {
+                this.$emit('focus', e);
+            },
+            blur (e) {
+                this.$emit('blur', e);
+            },
+            addSubtask () {
+                this.$emit('addsubtask', this.subtaskInput);
+                this.clearInputFlags();
+                this.isSaveDisabled = false;
+            },
+            taskIn (e) {
+                this.isSaveDisabled = false;
+                this.$emit('taskinput', {
+                    taskInput: e,
+                })
+            },
+            clearInputFlags () {
+                //нельзя добавить пустое задание
+                this.isSaveDisabled = true;
+                //очищение инпута задачи
+                this.subtaskInput = '';
+            }
+        },
         components: {
             Modal
         }
@@ -123,5 +144,13 @@
 </script>
 
 <style>
+     .modal-title {
+        font-size: 18px;
+    }
 
+    .subtask-modal-list {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+    }
 </style>

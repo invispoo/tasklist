@@ -41,6 +41,7 @@ export default {
         },
         //добавить задачу
         addSubtask(state, payload){
+            console.log(state.buffer)
             state.buffer.push({
                 subtaskName: payload.data,
                 status: false
