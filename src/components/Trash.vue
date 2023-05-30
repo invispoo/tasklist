@@ -237,3 +237,91 @@
                 </template>
             </modal>
         </div>
+
+                <!--Панель управления-->
+                <v-card
+        color="teal lighten-3"
+        max-width="240"
+        elevation="4"
+        class="mx-auto mt-10"
+        >
+            <v-container>
+                <v-row>
+                    <v-card-actions>
+                        <v-col>
+                            <v-btn
+                            icon
+                            color="white"
+                            x-large
+                            @click="showAddModal">
+                                <v-icon>
+                                    mdi-plus-box-outline
+                                </v-icon>
+                            </v-btn>
+                        </v-col>
+                        
+                        <v-col>
+                            <v-btn
+                            icon
+                            color="white"
+                            x-large
+                            @click="listenDelete = true, listenEdit = false" 
+                            :disabled="isTasklistEmpty">
+                                <v-icon>
+                                    mdi-close-box-outline
+                                </v-icon>
+                            </v-btn>
+                        </v-col>
+                        
+                        <v-col>
+                            <v-btn
+                            icon
+                            color="white"
+                            x-large
+                            @click="listenEdit = true, listenDelete = false" 
+                            :disabled="isTasklistEmpty">
+                                <v-icon>
+                                    mdi-pencil-outline
+                                </v-icon>
+                            </v-btn>
+                        </v-col>
+                    </v-card-actions>
+                </v-row> 
+            </v-container>
+        </v-card>  
+
+        <div class="mt-8">
+            <v-row justify="space-around" v-if="listenDelete && !listenEdit">
+                <h3 class="white--text">
+                    Выберите, какое задание удалить
+                    <v-btn
+                    icon
+                    color="teal lighten-3"
+                    x-large
+                    v-if="listenDelete" 
+                    @click="listenDelete = false" 
+                    :disabled="isTasklistEmpty">
+                        <v-icon>
+                            mdi-close
+                        </v-icon>
+                    </v-btn>
+                </h3>
+            </v-row>
+
+            <v-row justify="space-around" v-if="listenEdit && !listenDelete">
+                <h3 class="white--text">
+                    Выберите, какое задание отредактировать
+                    <v-btn
+                    icon
+                    color="teal lighten-3"
+                    x-large
+                    v-if="listenEdit" 
+                    @click="listenEdit = false" 
+                    :disabled="isTasklistEmpty">
+                        <v-icon>
+                            mdi-close
+                        </v-icon>
+                    </v-btn>
+                </h3>
+            </v-row>
+        </div> 

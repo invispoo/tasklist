@@ -1,93 +1,13 @@
 <!--Основной компонент приложения-->
 <template>
-    <div class="app-container">
+    <div class="app-container">   
+
         <!--Панель управления-->
-        <v-card
-        color="teal lighten-3"
-        max-width="240"
-        elevation="4"
-        class="mx-auto mt-10"
-        >
-            <v-container>
-                <v-row>
-                    <v-card-actions>
-                        <v-col>
-                            <v-btn
-                            icon
-                            color="white"
-                            x-large
-                            @click="showAddModal">
-                                <v-icon>
-                                    mdi-plus-box-outline
-                                </v-icon>
-                            </v-btn>
-                        </v-col>
-                        
-                        <v-col>
-                            <v-btn
-                            icon
-                            color="white"
-                            x-large
-                            @click="listenDelete = true, listenEdit = false" 
-                            :disabled="isTasklistEmpty">
-                                <v-icon>
-                                    mdi-close-box-outline
-                                </v-icon>
-                            </v-btn>
-                        </v-col>
-                        
-                        <v-col>
-                            <v-btn
-                            icon
-                            color="white"
-                            x-large
-                            @click="listenEdit = true, listenDelete = false" 
-                            :disabled="isTasklistEmpty">
-                                <v-icon>
-                                    mdi-pencil-outline
-                                </v-icon>
-                            </v-btn>
-                        </v-col>
-                    </v-card-actions>
-                </v-row> 
-            </v-container>
-        </v-card>  
-
-        <div class="mt-8">
-            <v-row justify="space-around" v-if="listenDelete && !listenEdit">
-                <h3 class="white--text">
-                    Выберите, какое задание удалить
-                    <v-btn
-                    icon
-                    color="teal lighten-3"
-                    x-large
-                    v-if="listenDelete" 
-                    @click="listenDelete = false" 
-                    :disabled="isTasklistEmpty">
-                        <v-icon>
-                            mdi-close
-                        </v-icon>
-                    </v-btn>
-                </h3>
-            </v-row>
-
-            <v-row justify="space-around" v-if="listenEdit && !listenDelete">
-                <h3 class="white--text">
-                    Выберите, какое задание отредактировать
-                    <v-btn
-                    icon
-                    color="teal lighten-3"
-                    x-large
-                    v-if="listenEdit" 
-                    @click="listenEdit = false" 
-                    :disabled="isTasklistEmpty">
-                        <v-icon>
-                            mdi-close
-                        </v-icon>
-                    </v-btn>
-                </h3>
-            </v-row>
-        </div>    
+        <dashboard @add="showAddModal"
+        @delete="listenDelete=$event" 
+        @edit="listenEdit=$event"
+        :listenDelete="listenDelete"
+        :listenEdit="listenEdit"/>
 
         <!--Модальное окно добавления задания-->
         <add-edit-modal :isModalVisible="isAddModalVisible" 
@@ -105,11 +25,10 @@
                 flat 
                 v-if="buffer.length > 0">
                     <h5 v-for="(subtask, index) in buffer">
-                        <p class="px-2">
+                        <p class="pt-2">
                             {{ subtask.subtaskName }}
                         </p>
-                        <v-divider 
-                        v-if="index < buffer.length - 1"/>
+                        <v-divider class="pt-1" v-if="index < buffer.length - 1"/>
                     </h5>
                 </v-card>
             </template>
@@ -151,19 +70,19 @@
                         </v-btn>
                     </h4>
                 </v-row>
-                <table class="table table-bordered subtask-table" v-if="editBuffer.subtask.length > 0">
+                <v-simple-table dense class="subtask-table elevation-2" v-if="editBuffer.subtask.length > 0">
                     <tbody>
                         <tr>
-                            <th class="text-center">Статус</th>
+                            <th class="text-center table-border">Статус</th>
                             <th class="text-center">Название</th>
                         </tr>
                         <tr v-for="(subtask, subtaskIndex) in editBuffer.subtask">
-                            <td>
+                            <td class="table-border">
                                 <input class="mt-4 mx-auto" 
                                 type="checkbox"  
                                 @input="isSaveEditDisabled = false"
                                 v-model="subtask.status">                                               
-                            </td>                            
+                            </td>                        
                             <td @click="readItem(subtaskIndex)">                                           
                                 <div>
                                     <v-textarea
@@ -181,7 +100,7 @@
                             </td>						
                         </tr>                                       
                     </tbody> 
-                </table>
+                </v-simple-table>
             </template>
             <template #journal-buttons>
                 <div>
@@ -200,7 +119,7 @@
         </add-edit-modal>
 
         <!--Модальное окно удаления задания-->
-        <div class="delete-modal">
+        <div>
             <modal :dialog="isDeleteModalVisible" 
             @close="closeDeleteModal" 
             @reject="closeDeleteModal" 
@@ -209,13 +128,13 @@
                     <h4 class="modal-title">Удалить задание</h4>
                 </template>
                 <template #body>
-                    <h5>Вы действительно хотите удалить это задание?</h5>
+                    <h5 class="modal-font">Вы действительно хотите удалить это задание?</h5>
                 </template>
             </modal>
         </div>
 
         <!--Модальное окно удаления задачи-->
-        <div class="delete-sub-modal">
+        <div>
             <modal :dialog="isSubDeleteModalVisible" 
             @close="closeSubDeleteModal" 
             @reject="closeSubDeleteModal" 
@@ -224,13 +143,13 @@
                     <h4 class="modal-title">Удалить задачу</h4>
                 </template>
                 <template #body>
-                    <h5>Вы действительно хотите удалить эту задачу?</h5>
+                    <h5 class="modal-font">Вы действительно хотите удалить эту задачу?</h5>
                 </template>
             </modal>
         </div>
 
         <!--Модальное окно подтверждения отмены редактирования-->
-        <div class="reject-edit-modal">
+        <div>
             <modal :dialog="isRejectEditModalVisible" 
             @close="closeRejectEditModal" 
             @reject="closeRejectEditModal" 
@@ -239,8 +158,8 @@
                     <h4 class="modal-title">Отменить изменение</h4>
                 </template>
                 <template #body>
-                    <h5>Вы действительно хотите отменить изменения?</h5>
-                    <h5>Несохраненные изменения будут удалены.</h5>
+                    <h5 class="modal-font">Вы действительно хотите отменить изменения?</h5>
+                    <h5 class="modal-font">Несохраненные изменения будут удалены.</h5>
                 </template>
             </modal>
         </div>
@@ -265,7 +184,7 @@
                                 <template #activator="props"> 
                                     <div class="subtask-table-container">
                                         <div class="main-table-row" v-for="(subtask, subtaskIndex) in task.subtask.slice(0,5)" :props="props">
-                                            <h5 class="subtask-table-text my-1">
+                                            <h5 class="modal-font my-1">
                                                 {{ subtask.subtaskName }}
                                             </h5>
                                             <input class="mx-2" 
@@ -298,10 +217,11 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex';
+    import {mapState} from 'vuex';
 	import {mapActions} from 'vuex';
     import Modal from './Modal';
-    import AddEditModal from './AddEditModal'
+    import Dashboard from './Dashboard';
+    import AddEditModal from './AddEditModal';
     import { tasklistQuery } from "../apollo.js";
 
     export default {
@@ -335,10 +255,6 @@
                 // ADD
                 isAddModalVisible: false, //видимость модального окна добавления задания
                 taskInput: '', //ввод названия задания
-                subtaskAddInput: '', //ввод названия задачи
-                showSubtaskInput: false, //показать/скрыть ввод названия задачи
-                addSubtaskDisabled: true, //нельзя добавить задачу с пустым названием
-                isSaveAddDisabled: true, //нельзя добавить задание с пустым названием или без задач
 
                 // DELETE
                 listenDelete: false, //слушатель выбора задания для удаления
@@ -352,9 +268,7 @@
                 listenSubtask: false, //слушатель выбора задачи для удаления
                 isEditModalVisible: false, //видимость модального окна редактирования задания
                 isRejectEditModalVisible: false, //видимость модального окна отмены редактирования задания
-                subtaskEditInput: '', //ввод названия задачи
                 editIndex: null, //индекс редактируемого задания
-                editInput: '', //ввод названия задания
                 isSaveEditDisabled: true, //сохранение задания запрещено                 
                 editBuffer: {}, //буфер редактирования задания  
                  
@@ -371,7 +285,7 @@
         },
         
         computed: {
-            ...mapGetters('tasklist', [
+            ...mapState('tasklist', [
                 'tasklist',
                 'buffer',
                 'mockCopy'
@@ -423,7 +337,6 @@
                 this.$set(this.tableMouse, index, false)
             },
 
-
             // ADD
             addTask(payload) {
                 this.$store.dispatch('tasklist/addTask', payload);
@@ -432,16 +345,11 @@
             },
             addSubtask(payload) {
                 this.$store.dispatch('tasklist/addSubtask', payload); 
-                //теперь можно сохранить задание, но опять нельзя добавить безымянную задачу
-                //this.isSaveAddDisabled = false;
-                //this.subtaskAddInput = '';
-                //this.addSubtaskDisabled = true;
             },
             showAddModal() {
                 this.isAddModalVisible = true;
             },
             closeAddModal() {
-                //console.log(this.taskInput)
                 //очистка буфера задач
                 this.clearBuffer();
                 //очищение инпутов
@@ -450,7 +358,6 @@
                 //вывод окна
                 this.isAddModalVisible = false;
             },
-
 
             // DELETE
             confirmDelete () {
@@ -469,7 +376,6 @@
                 this.deleteIndex = null;
             },
 
-
             // EDIT     
             addEditSubtask(subtaskInput) {
                 //новая задача добавляется в копию списка заданий
@@ -483,16 +389,7 @@
                     index: this.editBuffer.subtask.length - 1,
                     subtask: this.editBuffer.subtask[this.editBuffer.subtask.length - 1]
                 })
-                //теперь можно сохранить изменения, опять нельзя добавить безымянную задачу
-                //this.isSaveEditDisabled = false;
-                //this.subtaskEditInput = '';
-                //this.addSubtaskDisabled = true;
             }, 
-            /*changeBufferStatus(subtaskIndex) {
-                //смена состояния задачи в копии списка заданий
-                this.editBuffer.subtask[subtaskIndex].status = !this.editBuffer.subtask[subtaskIndex].status;
-                this.isSaveEditDisabled = false;
-            },*/
             confirmEdit() {
                 this.$store.dispatch('tasklist/confirmEdit', {
                     index: this.editIndex,
@@ -567,7 +464,6 @@
                 this.isEditModalVisible = true;
             },
 
-
             //JOURNAL
             taskFocus(e) {
                 //сохранение значения до редактирования
@@ -601,6 +497,14 @@
             },
             //добавление в журнал отмены записи одного из четырех типов:
             //добавление, удаление, изменение текста задания/задачи
+            
+            journalObject(note, name) {
+                return {
+                    type: name,
+                    index: note.index,
+                    subtask: note.subtask
+                };
+            },
             undo() {              
                 let lastNote = this.undoJournal[this.undoJournal.length - 1]; 
 
@@ -608,11 +512,7 @@
                     //удаляем задачу
                     this.editBuffer.subtask.splice(lastNote.index, 1);
                     //помещаем запись в redo журнал
-                    this.redoJournal.push({
-                        type: 'add',
-                        index: lastNote.index,
-                        subtask: lastNote.subtask
-                    });
+                    this.redoJournal.push(this.journalObject(lastNote, 'add'));
                     //очищаем последнюю запись
                     this.undoJournal.splice(this.undoJournal.length - 1, 1);
                 }
@@ -620,11 +520,7 @@
                     //добавляем задачу
                     this.editBuffer.subtask.splice(lastNote.index, 0, lastNote.subtask);
                     //помещаем запись в redo журнал
-                    this.redoJournal.push({
-                        type: 'delete',
-                        index: lastNote.index,
-                        subtask: lastNote.subtask
-                    });
+                    this.redoJournal.push(this.journalObject(lastNote, 'delete'));
                     //очищаем последнюю запись
                     this.undoJournal.splice(this.undoJournal.length - 1, 1);
                 }
@@ -660,11 +556,7 @@
                     //добавляем задачу
                     this.editBuffer.subtask.splice(lastNote.index, 0, lastNote.subtask);
                     //помещаем запись в undo журнал
-                    this.undoJournal.push({
-                        type: 'add',
-                        index: lastNote.index,
-                        subtask: lastNote.subtask
-                    });
+                    this.undoJournal.push(this.journalObject(lastNote, 'add'));
                     //очищаем последнюю запись
                     this.redoJournal.splice(this.redoJournal.length - 1, 1);
                 }
@@ -672,11 +564,7 @@
                     //удаляем задачу
                     this.editBuffer.subtask.splice(lastNote.index, 1);
                     //помещаем запись в undo журнал
-                    this.undoJournal.push({
-                        type: 'delete',
-                        index: lastNote.index,
-                        subtask: lastNote.subtask
-                    });
+                    this.undoJournal.push(this.journalObject(lastNote, 'delete'));
                     //очищаем последнюю запись
                     this.redoJournal.splice(this.redoJournal.length - 1, 1);
                 }
@@ -704,11 +592,11 @@
                     this.redoJournal.splice(this.redoJournal.length - 1, 1);
                 }
             },
-
         },
         components: {
             Modal,
-            AddEditModal
+            AddEditModal,
+            Dashboard
         }
     }
 </script>
@@ -743,11 +631,6 @@
         border-right: 1px solid rgb(196, 187, 187);
     }
 
-    .subtask-table-text {
-        font-weight: normal;
-        font-size: 14px;
-    }
-
     .subtask-table-container {
         display: flex;
         flex-direction: column;
@@ -764,6 +647,8 @@
     }
 
     .tooltip-text {
+        font-weight: normal;
+        font-size: 13px;
         white-space: normal;
         line-height: 1.5;
         word-break: break-word;
@@ -780,9 +665,8 @@
         font-size: 18px;
     }
 
-    .subtask-modal-list {
-        display: flex;
-        align-items: center;
-        justify-content: start;
+    .modal-font {
+        font-weight: normal;
+        font-size: 14px;
     }
 </style>

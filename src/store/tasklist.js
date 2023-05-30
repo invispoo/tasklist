@@ -8,18 +8,6 @@ export default {
     },
 
     getters: {
-        //массив заданий
-        tasklist(state) {
-            return state.tasklist;
-        },
-        //массив буфера задач (используется в окне добавления задания, при отказе от добавления очищается)
-        buffer(state) {
-            return state.buffer;
-        },
-        //проверка дублирования мок-объектов
-        mockCopy(state) {
-            return state.mockCopy;
-        },
     },
 
     mutations: {
@@ -41,7 +29,6 @@ export default {
         },
         //добавить задачу
         addSubtask(state, payload){
-            console.log(state.buffer)
             state.buffer.push({
                 subtaskName: payload.data,
                 status: false

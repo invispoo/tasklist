@@ -20,14 +20,13 @@
                     auto-grow
                     />
                 </div>
-
                 <div>
-                    <h4 class="subtask-modal-list">Список задач    
+                    <h4 class="subtask-modal-list pb-3">Список задач    
                         <v-btn
                         icon
                         color="teal"
                         small
-                        @click="showSubtaskInput = !showSubtaskInput"><!--менять-->
+                        @click="showSubtaskInput = !showSubtaskInput">
                             <v-icon>
                                 mdi-plus-box-outline
                             </v-icon>
@@ -38,7 +37,6 @@
                         <v-row class="d-flex justify-center align-center pl-3">
                             <v-textarea 
                             placeholder="Введите текст задачи"
-
                             v-model="subtaskInput"
                             color="teal"
                             outlined
@@ -68,7 +66,7 @@
                 small
                 class="ma-1 white--text">
                     Сохранить
-                </v-btn> <!--менять-->
+                </v-btn>
                 <v-btn 
                 @click="close"
                 color="red darken-1"
@@ -86,13 +84,13 @@
 <script>
     import Modal from './Modal';
     export default {
-        props: ['isModalVisible', 'modalTitle', 'taskInput', 'listenSubtask', 'isSaveEditDisabled'],
+        props: ['isModalVisible', 'modalTitle', 'taskInput', 'isSaveEditDisabled'],
         data () {
             return {
                 showSubtaskInput: false,
                 isSaveDisabled: true,
-                subtaskInput: '',//
-                addSubtaskDisabled: true//
+                subtaskInput: '',
+                addSubtaskDisabled: true
             }
         },
         computed: {
@@ -104,13 +102,13 @@
             close () {
                 //ввод задачи не показывается
                 this.showSubtaskInput = false;
-                this.clearInputFlags();
+                this.clearInputFlags(true);
                 this.$emit('close');
             },
             confirm () {
                 //ввод задачи не показывается
                 this.showSubtaskInput = false;
-                this.clearInputFlags();
+                this.clearInputFlags(true);
                 this.$emit('confirm');
             },
             focus (e) {
@@ -121,8 +119,7 @@
             },
             addSubtask () {
                 this.$emit('addsubtask', this.subtaskInput);
-                this.clearInputFlags();
-                this.isSaveDisabled = false;
+                this.clearInputFlags(false);
             },
             taskIn (e) {
                 this.isSaveDisabled = false;
@@ -130,9 +127,9 @@
                     taskInput: e,
                 })
             },
-            clearInputFlags () {
+            clearInputFlags (flag) {
                 //нельзя добавить пустое задание
-                this.isSaveDisabled = true;
+                this.isSaveDisabled = flag;
                 //очищение инпута задачи
                 this.subtaskInput = '';
             }
