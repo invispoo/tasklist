@@ -94,7 +94,10 @@
     import {mapState} from 'vuex';
 
     export default {
-        props: ['listenDelete', 'listenEdit'],
+        props: {
+            listenDelete: Boolean,
+            listenEdit: Boolean,
+        },
         computed: {
             ...mapState('tasklist', [
                 'tasklist',
@@ -118,7 +121,3 @@
         }
     }
 </script>
-
-<style>
-
-</style>

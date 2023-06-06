@@ -77,14 +77,21 @@
             </template>
         </modal>
     </div>    
-
- 
 </template>
 
 <script>
     import Modal from './Modal';
     export default {
-        props: ['isModalVisible', 'modalTitle', 'taskInput', 'isSaveEditDisabled'],
+        components: {
+            Modal
+        },
+        props: {
+            isModalVisible: Boolean,
+            isSaveEditDisabled: Boolean,
+            modalTitle: String,
+            taskInput: String,
+        },
+
         data () {
             return {
                 showSubtaskInput: false,
@@ -134,9 +141,6 @@
                 this.subtaskInput = '';
             }
         },
-        components: {
-            Modal
-        }
     }
 </script>
 

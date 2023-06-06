@@ -1,21 +1,4 @@
 <!--Компонент модального окна-->
-<script>
-    export default {
-        props: ['dialog'],
-        methods: {
-            close() {
-                this.$emit('close'); //событие закрытия окна
-            },
-            confirm() {
-                this.$emit('confirm'); //событие подтверждения действий
-            },
-            reject() {
-                this.$emit('reject'); //событие отмены действий
-            },
-        },
-    }
-</script>
-
 <template>
     <div>
         <v-dialog
@@ -69,8 +52,26 @@
     </div>
 </template>
 
-<style scoped>
+<script>
+    export default {
+        props: {
+            dialog: Boolean,
+        },
+        methods: {
+            close() {
+                this.$emit('close'); //событие закрытия окна
+            },
+            confirm() {
+                this.$emit('confirm'); //событие подтверждения действий
+            },
+            reject() {
+                this.$emit('reject'); //событие отмены действий
+            },
+        },
+    }
+</script>
 
+<style scoped>
 .modal {
   max-height: 800px;
   min-height: 150px;
@@ -102,5 +103,4 @@
     display: flex;
     height: 60px; 
 }
-
 </style>

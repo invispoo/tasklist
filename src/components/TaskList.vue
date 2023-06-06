@@ -225,30 +225,15 @@
     import { tasklistQuery } from "../apollo.js";
 
     export default {
+        components: {
+            Modal,
+            AddEditModal,
+            Dashboard
+        },
         apollo: {
             getTask: {
                 query: tasklistQuery,
             }
-        },
-        mounted() {
-            const {tasklist} = this.getTask;
-            //предотвращение дублирования мок-объектов
-            if (JSON.stringify(this.mockCopy) !== JSON.stringify(this.getTask)) {
-                //удаление лишних свойст из результата запроса
-                for (let i = 0; i < tasklist.length; i++) {
-                    delete tasklist[i].__typename;
-                    for (let y = 0; y < tasklist[i].subtask.length; y++) {
-                        delete tasklist[i].subtask[y].__typename;
-                    }
-                    //добавляет мок-объекты в массив списка заданий
-                    this.addMock({
-                        taskName: tasklist[i].taskName,
-                        subtask: tasklist[i].subtask
-                    });   
-                }
-            }
-            //результат последнего запроса сохраняется, чтобы не использовать данные из него снова
-            this.addMockCopy(this.getTask);
         },
         data() {
             return {
@@ -283,7 +268,6 @@
                 timer: null, //таймер для вывода подсказки на длинных заданиях
             }
         },
-        
         computed: {
             ...mapState('tasklist', [
                 'tasklist',
@@ -299,6 +283,26 @@
             redoJournalActivated() {
                 return this.redoJournal.length === 0;
             },
+        },
+        mounted() {
+            const {tasklist} = this.getTask;
+            //предотвращение дублирования мок-объектов
+            if (JSON.stringify(this.mockCopy) !== JSON.stringify(this.getTask)) {
+                //удаление лишних свойст из результата запроса
+                for (let i = 0; i < tasklist.length; i++) {
+                    delete tasklist[i].__typename;
+                    for (let y = 0; y < tasklist[i].subtask.length; y++) {
+                        delete tasklist[i].subtask[y].__typename;
+                    }
+                    //добавляет мок-объекты в массив списка заданий
+                    this.addMock({
+                        taskName: tasklist[i].taskName,
+                        subtask: tasklist[i].subtask
+                    });   
+                }
+            }
+            //результат последнего запроса сохраняется, чтобы не использовать данные из него снова
+            this.addMockCopy(this.getTask);
         },
         methods: {
             ...mapActions('tasklist', [
@@ -593,11 +597,6 @@
                 }
             },
         },
-        components: {
-            Modal,
-            AddEditModal,
-            Dashboard
-        }
     }
 </script>
 
